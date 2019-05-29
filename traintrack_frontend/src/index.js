@@ -1,6 +1,7 @@
 //Relevant DOM Manipulation //
 const stationContainer = document.createElement("ul");
 const pageBody = document.querySelector("body");
+  let arrivalCard = document.createElement("ul");
 pageBody.append(stationContainer);
 
 //Fetches initial station data and sends it to getUnique //
@@ -36,6 +37,8 @@ function getUnique(arr, station_descriptive_name) {
 
   fetchNewData(unique);
 }
+
+
 
 function fetchNewData(array) {
   var newData = [];
@@ -83,7 +86,8 @@ function grabArrivals(event, station) {
 }
 
 function showArrivals(arrivals) {
-  let arrivalCard = document.createElement("ul");
+
+  arrivalCard.setAttribute("id", "arrivalCard")
   for (arrival of arrivals.ctatt.eta) {
     let arrivalListing = document.createElement("li");
     let currentDate = new Date();
@@ -100,6 +104,12 @@ function showArrivals(arrivals) {
     arrivalCard.append(arrivalListing);
     stationDiv.append(arrivalCard);
   }
+  let stationDiv = document.getElementById("arrivalCard").parentNode.id
+  fetch("http://localhost:3000/api/v1/comments/")
+  .then(resp => resp.json())
+  .then(comments => showComments(comments, stationDiv))
+
+
   let commentForm = document.createElement("form");
   let commentInput = document.createElement("input");
   let commentButton = document.createElement("button");
@@ -108,13 +118,22 @@ function showArrivals(arrivals) {
   commentForm.append(commentInput, commentButton);
   arrivalCard.append(commentForm);
   commentForm.addEventListener("submit", event =>
-    submitComment(event, station_div)
+    submitComment(event, commentInput, stationDiv)
   );
 }
 
-function submitComment(event, station_div) {
+function showComments(comments, stationDiv) {
+let filteredComments = comments.filter(comment => comment.stationNum === stationDiv)
+filteredComments.forEach( comment => {
+let commentLi = document.createElement("li")
+commentLi.innerHTML = comment.content
+
+arrivalCard.append(commentLi)
+})
+}
+function submitComment(event, commentInput, stationDiv) {
   event.preventDefault();
-  fetch("http://localhost:3000/comments", {
+  fetch("http://localhost:3000/api/v1/comments", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -122,7 +141,7 @@ function submitComment(event, station_div) {
     },
     body: JSON.stringify({
       content: commentInput.value,
-      stationNum: station_div.id
+      stationNum: stationDiv
     })
   });
 }
