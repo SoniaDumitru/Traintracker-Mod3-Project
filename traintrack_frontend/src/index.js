@@ -1,8 +1,10 @@
 //Relevant DOM Manipulation //
+
 const stationContainer = document.createElement("ul");
+stationContainer.setAttribute("id", "stationContainer");
 const pageBody = document.querySelector("body");
-  let arrivalCard = document.createElement("ul");
 pageBody.append(stationContainer);
+let stationMarker = document.querySelectorAll("div");
 
 //Fetches initial station data and sends it to getUnique //
 function fetchData() {
@@ -38,8 +40,6 @@ function getUnique(arr, station_descriptive_name) {
   fetchNewData(unique);
 }
 
-
-
 function fetchNewData(array) {
   var newData = [];
   for (var i = 0; i < array.length; i++) {
@@ -63,10 +63,15 @@ function renderStations(newData) {
     station_div.class = station;
     station_div.setAttribute("id", station.map_id);
     station_div.innerHTML = station.station_descriptive_name;
+    if (station_div.innerHTML.includes("blue")) {
+      station_div.style.color = "blue";
+    }
     station_div.addEventListener(
       "click",
       event => grabArrivals(event, station),
-      { once: true }
+      {
+        // once: true
+      }
     );
     stationContainer.append(station_div);
   }
@@ -86,8 +91,14 @@ function grabArrivals(event, station) {
 }
 
 function showArrivals(arrivals) {
+  let stationDiv = document.getElementById(arrivals.ctatt.eta[0].staId);
+  let title = stationDiv.firstChild;
+  title.addEventListener("click", event => clearDiv(event, stationDiv), {
+    once: true
+  });
 
-  arrivalCard.setAttribute("id", "arrivalCard")
+  let arrivalCard = document.createElement("ul");
+  arrivalCard.setAttribute("class", "arrivalCard");
   for (arrival of arrivals.ctatt.eta) {
     let arrivalListing = document.createElement("li");
     let currentDate = new Date();
@@ -96,20 +107,32 @@ function showArrivals(arrivals) {
     let etaTime = etaDate.getTime();
     let arrivalTime = Math.round((etaTime - currentTime) / 1000 / 60);
 
-    arrivalListing.innerText = `Destination: ${
-      arrival.destNm
-    } ETA: ${arrivalTime} minutes`;
-    let stationDiv = document.getElementById(arrival.staId);
+    arrivalListing.innerHTML = `Destination: ${arrival.destNm} ETA: ${
+      arrival.isApp == 1
+        ? "Approaching"
+        : arrivalTime + " " + "minutes" && arrivalTime < 0
+        ? "Delayed"
+        : arrivalTime + " " + "minutes"
+    }`;
 
     arrivalCard.append(arrivalListing);
     stationDiv.append(arrivalCard);
   }
-  let stationDiv = document.getElementById("arrivalCard").parentNode.id
+  let stationNumber = stationDiv.id;
+  let commentContainer = document.createElement("ul");
   fetch("http://localhost:3000/api/v1/comments/")
-  .then(resp => resp.json())
-  .then(comments => showComments(comments, stationDiv))
-
-
+    .then(resp => resp.json())
+    .then(comments =>
+      comments.forEach(comment => {
+        if (comment.stationNum == stationNumber) {
+          let commentLi = document.createElement("li");
+          commentLi.innerHTML = comment.content;
+          commentContainer.style.border = "thick solid #0000FF";
+          commentContainer.append(commentLi);
+          arrivalCard.append(commentContainer);
+        }
+      })
+    );
   let commentForm = document.createElement("form");
   let commentInput = document.createElement("input");
   let commentButton = document.createElement("button");
@@ -118,21 +141,31 @@ function showArrivals(arrivals) {
   commentForm.append(commentInput, commentButton);
   arrivalCard.append(commentForm);
   commentForm.addEventListener("submit", event =>
-    submitComment(event, commentInput, stationDiv)
+    submitComment(event, commentInput, stationNumber)
   );
+  // closeButton = document.createElement("button");
+  // closeButton.innerHTML = "X";
+  // stationDiv.append(closeButton);
 }
 
-function showComments(comments, stationDiv) {
-let filteredComments = comments.filter(comment => comment.stationNum === stationDiv)
-filteredComments.forEach( comment => {
-let commentLi = document.createElement("li")
-commentLi.innerHTML = comment.content
+// function showComments(comments, stationNumber) {
+//   comments.forEach(comment => {
+//     if (comment.stationNum == stationNumber) {
+//       let commentLi = document.createElement("li");
+//       commentLi.innerHTML = comment.content;
+//
+//       arrivalCard.append(commentLi);
+//     }
+//   });
+// }
 
-arrivalCard.append(commentLi)
-})
-}
-function submitComment(event, commentInput, stationDiv) {
+function clearDiv(event, stationDiv) {
   event.preventDefault();
+  stationDiv.removeChild(stationDiv.childNodes[1]);
+}
+function submitComment(event, commentInput, stationNumber) {
+  event.preventDefault();
+
   fetch("http://localhost:3000/api/v1/comments", {
     method: "POST",
     headers: {
@@ -141,9 +174,14 @@ function submitComment(event, commentInput, stationDiv) {
     },
     body: JSON.stringify({
       content: commentInput.value,
-      stationNum: stationDiv
+      stationNum: stationNumber
     })
   });
+  let newComment = document.createElement("li");
+  newComment.innerHTML = commentInput.value;
+  event.target.parentElement.append(newComment);
+  debugger;
+  event.target.reset();
 }
 //lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=ba92028c4ac34d1c89d827de312bb41d&max=6&mapid=40360&outputType=JSON
 //Helper function for fetchNewData
@@ -154,6 +192,27 @@ function fetchProperty(data, property) {
     }
   }
 }
+
+function filterAll(c) {
+  if (c == "all") {
+    stationContainer.innerHTML = "";
+    fetchData();
+  }
+}
+function filterOrange(c) {
+  let orangeLine = [];
+  let allStations = Array.from(stationContainer.childNodes);
+  debugger;
+  let orangeStations = allStations.filter(station =>
+    station.innerHTML.includes("orange")
+  );
+  // allStations.forEach(childNode => {
+  //   if (childNode.innerText.includes("orange")) {
+  //     orangeLine.push(childNode.id);
+  //   }
+  // });
+}
+
 // Event Listeners//
 
 // arrT - arrival time;
@@ -163,4 +222,5 @@ function fetchProperty(data, property) {
 // rt - route
 // http://lapi.transitchicago.com/api/1.0/ttpositions.aspx?key=4ba28f6b2b8843bf9cef1c0fcc05f874&rt=red&outputType=JSON
 // http://lapi.transitchicago.com/api/1.0/ttpositions.aspx?key=ba92028c4ac34d1c89d827de312bb41d&rt=red&outputType=JSON
+//
 //

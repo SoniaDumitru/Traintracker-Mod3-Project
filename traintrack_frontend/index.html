@@ -2,9 +2,32 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="index.css" />
     <title></title>
   </head>
   <body>
+    <h1>Chicago Train Happenings</h1>
+    <div id="myBtnContainer">
+      <button class="btn active" onclick="filterAll('all')">Show all</button>
+      <button class="btn" onclick="filterOrange('orange')">Orange Line</button>
+      <button class="btn" onclick="filterSelection('animals')">
+        Pink Line
+      </button>
+      <button class="btn" onclick="filterSelection('fruits')">
+        Green Line
+      </button>
+      <button class="btn" onclick="filterSelection('colors')">Red Line</button>
+      <button class="btn" onclick="filterSelection('colors')">
+        Brown Line
+      </button>
+      <button class="btn" onclick="filterSelection('colors')">
+        Purple Line
+      </button>
+      <button class="btn" onclick="filterSelection('colors')">Blue Line</button>
+      <button class="btn" onclick="filterSelection('colors')">
+        Yellow Line
+      </button>
+    </div>
     <script defer type="text/javascript" src="src/index.js"></script>
   </body>
 </html>
