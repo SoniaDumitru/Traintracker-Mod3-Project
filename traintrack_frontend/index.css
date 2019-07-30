@@ -4,17 +4,42 @@ div {
   margin: auto;
   width: anything under 100%;
   text-align: center;
+  font-size: 24px;
   padding: 3px;
   font-family: "Nunito", sans-serif;
 }
 li {
   cursor: crosshair;
 }
+
+background {
+  /* The image used */
+  background-image: url("http://24.media.tumblr.com/2050bee97c10c763cac0cd6f347d32cf/tumblr_mw48grNxww1rtp2uuo1_500.png");
+
+  /* Full height */
+  height: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 body {
   position: absolute;
   top: 20px;
   left: 20px;
   font-family: "Raleway", sans-serif;
+  /* background { */
+  /* The image used */
+
+  /* Full height */
+  /* height: 100%; */
+
+  /* Center and scale the image nicely */
+  /* background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover; */
+  /* } */
 }
 ul {
   box-sizing: border-box;
@@ -24,15 +49,18 @@ ul {
 }
 p {
   margin: 4px;
+  font-size: 20px;
 }
 
 h1 {
   display: block;
+  cursor: pointer;
   margin: auto;
   width: anything under 100%;
   text-align: center;
   padding: 5px;
   font-weight: 700;
+  font-size: 40px;
   font-family: "Raleway", sans-serif;
 }
 .orange {

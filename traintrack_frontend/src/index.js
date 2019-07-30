@@ -183,7 +183,7 @@ function submitComment(event, commentInput, stationNumber) {
   });
   let newComment = document.createElement("p");
   newComment.innerHTML = commentInput.value;
-  event.target.nextSibling.append(newComment);
+  event.target.parentElement.append(newComment);
 
   event.target.reset();
 }
