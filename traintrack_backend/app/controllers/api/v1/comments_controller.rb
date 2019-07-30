@@ -8,7 +8,7 @@ class Api::V1::CommentsController < ApplicationController
 
   def show
     @comment = Comment.find(params[:id])
-    render json: @comment 
+    render json: @comment
   end
 
   def create
@@ -21,7 +21,7 @@ class Api::V1::CommentsController < ApplicationController
   private
 
   def comment_params
-    params.require(:comment).permit(:content, :stationNum)
+    params.require(:comment).permit(:content, :stationNum, :created_at)
   end
 
   def find_comment
